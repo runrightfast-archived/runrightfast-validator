@@ -16,6 +16,7 @@
 
 'use strict';
 var expect = require('chai').expect;
+var lodash = require('lodash');
 
 var validatorDomain = require('..').validatorDomain;
 
@@ -27,13 +28,21 @@ describe('Validator Domain', function() {
 
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
-				version : '1.0.0'
+				version : '1.0.0',
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
 			expect(schema.namespace).to.equal(options.namespace);
 			expect(schema.version).to.equal(options.version);
+			expect(schema.id).to.exist;
+			expect(schema.createdOn).to.exist;
+			expect(schema.updatedOn).to.exist;
+			expect(lodash.isString(schema.id)).to.equal(true);
+			expect(lodash.isDate(schema.createdOn)).to.equal(true);
+			expect(lodash.isDate(schema.updatedOn)).to.equal(true);
 
+			console.log(schema);
 		});
 
 		it('constructor options.namespace format must match pattern: ns://namespace', function(done) {
@@ -41,6 +50,46 @@ describe('Validator Domain', function() {
 
 			var options = {
 				namespace : '//runrightfast.co/couchbase',
+				version : '1.0.0',
+				description : 'Couchbase config schema'
+			};
+
+			try {
+				new ObjectSchema(options);
+				done(new Error('expected validation error'));
+			} catch (err) {
+				console.log(err);
+				expect(err._errors.length).to.equal(1);
+				done();
+			}
+
+		});
+
+		it('constructor options.version format must match pattern: x.x.x', function(done) {
+			var ObjectSchema = validatorDomain.ObjectSchema;
+
+			var options = {
+				namespace : 'ns://runrightfast.co/couchbase',
+				version : '1.0',
+				description : 'Couchbase config schema'
+			};
+
+			try {
+				new ObjectSchema(options);
+				done(new Error('expected validation error'));
+			} catch (err) {
+				console.log(err);
+				expect(err._errors.length).to.equal(1);
+				done();
+			}
+
+		});
+
+		it('constructor options.description is required', function(done) {
+			var ObjectSchema = validatorDomain.ObjectSchema;
+
+			var options = {
+				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0'
 			};
 
@@ -49,6 +98,21 @@ describe('Validator Domain', function() {
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
+				expect(err._errors.length).to.equal(1);
+				done();
+			}
+
+		});
+
+		it('constructor options are required', function(done) {
+			var ObjectSchema = validatorDomain.ObjectSchema;
+
+			try {
+				new ObjectSchema();
+				done(new Error('expected validation error'));
+			} catch (err) {
+				console.log(err);
+				expect(err._errors.length).to.equal(3);
 				done();
 			}
 
