@@ -22,6 +22,10 @@ var validatorDomain = require('..').validatorDomain;
 var ObjectSchema = validatorDomain.ObjectSchema;
 var Type = validatorDomain.Type;
 var Property = validatorDomain.Property;
+var ObjectSchemaRegistry = require('..').ObjectSchemaRegistry;
+
+var objectSchemaRegistry = new ObjectSchemaRegistry();
+var getObjectSchemaType = objectSchemaRegistry.getSchemaType.bind(objectSchemaRegistry);
 
 describe('Validator Domain', function() {
 
@@ -30,7 +34,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			var schema = new ObjectSchema(options);
@@ -50,7 +55,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : '//runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			try {
@@ -68,7 +74,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			try {
@@ -85,7 +92,8 @@ describe('Validator Domain', function() {
 		it('constructor options.description is required', function(done) {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
-				version : '1.0.0'
+				version : '1.0.0',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			try {
@@ -105,7 +113,7 @@ describe('Validator Domain', function() {
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
-				expect(err._errors.length).to.equal(3);
+				expect(err._errors.length).to.equal(4);
 				done();
 			}
 		});
@@ -114,7 +122,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			var schema = new ObjectSchema(options);
@@ -135,7 +144,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			var schema = new ObjectSchema(options);
@@ -156,7 +166,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			var schema = new ObjectSchema(options);
@@ -180,7 +191,8 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema'
+				description : 'Couchbase config schema',
+				getObjectSchemaType : getObjectSchemaType
 			};
 
 			var schema = new ObjectSchema(options);
