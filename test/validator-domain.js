@@ -224,7 +224,7 @@ describe('Validator Domain', function() {
 			}
 		});
 
-		it('must be constructed with a name, description, and allowExtraKeys', function() {
+		it('can be constructed with a name, description, and allowExtraKeys', function(done) {
 			var options = {
 				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
@@ -234,7 +234,131 @@ describe('Validator Domain', function() {
 			var type = new Type(options);
 			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.description);
-			expect(type.allowExtraKeys).to.equal(true);
+			expect(type.allowExtraKeys).to.equal(options.allowExtraKeys);
+
+			options.allowExtraKeys = false;
+			type = new Type(options);
+			expect(type.allowExtraKeys).to.equal(options.allowExtraKeys);
+
+			options.allowExtraKeys = 'asdad';
+			try {
+				new Type(options);
+				done(new Error('expected Type to fail validation because allowExtraKeys must be a boolean'));
+			} catch (err) {
+				done();
+			}
+		});
+
+		it('can be constructed with a name, description, and properties', function(done) {
+			var options = {
+				name : 'CouchbaseConnectionSettings',
+				description : 'Couchbase Connection Settings',
+				properties : {
+					port : {
+						name : 'port',
+						type : 'Number',
+						constraints : [ {
+							method : 'required',
+							args : []
+						}, {
+							method : 'min',
+							args : [ 0 ]
+						} ]
+					},
+					connection : {
+						name : 'connection',
+						type : 'Object',
+						constraints : [ {
+							method : 'objectSchemaType',
+							args : [ 'ns://runrightfast.co', '1.0.0', 'Connection' ]
+						}, ]
+					}
+				}
+			};
+
+			var objectSchema = new ObjectSchema({
+				namespace : 'ns://runrightfast.co',
+				version : '1.0.0',
+				description : 'Couchbase config schema',
+				types : {
+					Connection : {
+						name : 'Connection',
+						description : 'Connection Settings',
+						properties : {
+							port : {
+								name : 'port',
+								type : 'Number',
+								constraints : [ {
+									method : 'required',
+									args : []
+								} ]
+							},
+							host : {
+								name : 'host',
+								type : 'String',
+								constraints : [ {
+									method : 'required',
+									args : []
+								} ]
+							}
+						}
+					}
+				}
+			});
+			objectSchemaRegistry.registerSchema(objectSchema);
+
+			var type = new Type(options);
+			expect(type.name).to.equal(options.name);
+			expect(type.description).to.equal(options.description);
+
+			var schema = type.getSchema(getObjectSchemaType);
+			expect(schema).to.exist;
+			console.log(schema);
+
+			type.validate({
+				port : 8000
+			}, getObjectSchemaType);
+
+			type.validate({
+				port : 8000,
+				connection : {
+					host : 'localhost',
+					port : 8091
+				}
+			}, getObjectSchemaType);
+
+			try {
+				type.validate({}, getObjectSchemaType);
+				done(new Error('Expected validation to faile because port is required'));
+				return;
+			} catch (err) {
+				console.log(err);
+			}
+
+			try {
+				type.validate({
+					port : 'asdasd'
+				}, getObjectSchemaType);
+				done(new Error('Expected validation to faile because port must be a number'));
+				return;
+			} catch (err) {
+				console.log(err);
+			}
+
+			try {
+				type.validate({
+					port : 8000,
+					connection : {
+						port : 8091
+					}
+				}, getObjectSchemaType);
+				done(new Error('Expected validation to faile because connection.host is required'));
+				return;
+			} catch (err) {
+				console.log(err);
+			}
+
+			done();
 		});
 	});
 

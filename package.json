@@ -10,7 +10,8 @@
 	"scripts":{
 		"blanket":{
 			"pattern":[
-				"lib/rest-client.js"
+				"lib/object-schema-registry.js",
+				"lib/validator-domain.js"
 			]
 		}		
 	},

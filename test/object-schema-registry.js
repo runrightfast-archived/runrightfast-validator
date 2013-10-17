@@ -50,4 +50,38 @@ describe('ObjectSchemaRegistry', function() {
 		expect(type).to.exist;
 		console.log(type);
 	});
+
+	it('an implementation can be provided', function() {
+		var registry = new ObjectSchemaRegistry(new ObjectSchemaRegistry());
+
+		var objectSchema = new ObjectSchema({
+			namespace : 'ns://runrightfast.co',
+			version : '1.1.1',
+			description : 'RunRightFast Object Schema',
+			types : {
+				ConnectionConfig : {
+					name : 'ConnectionConfig'
+				}
+			}
+		});
+		registry.registerSchema(objectSchema);
+		var type = registry.getSchemaType({
+			namespace : objectSchema.namespace,
+			version : objectSchema.version,
+			type : 'ConnectionConfig'
+		});
+		expect(type).to.exist;
+		console.log(type);
+	});
+
+	it('checks that the provided implementation satisfies the ObjectSchemaRegistry interface', function(done) {
+		try {
+			new ObjectSchemaRegistry({});
+			done(new Error('Expected an Error because the impl is not valid'));
+		} catch (err) {
+			console.log(err);
+			done();
+		}
+
+	});
 });
