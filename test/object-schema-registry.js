@@ -39,8 +39,7 @@ describe('ObjectSchemaRegistry', function() {
 				ConnectionConfig : {
 					name : 'ConnectionConfig'
 				}
-			},
-			getObjectSchemaType : getObjectSchemaType
+			}
 		});
 		registry.registerSchema(objectSchema);
 		var type = registry.getSchemaType({

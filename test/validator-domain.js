@@ -34,8 +34,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
@@ -55,8 +54,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : '//runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			try {
@@ -74,8 +72,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			try {
@@ -92,8 +89,7 @@ describe('Validator Domain', function() {
 		it('constructor options.description is required', function(done) {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
-				version : '1.0.0',
-				getObjectSchemaType : getObjectSchemaType
+				version : '1.0.0'
 			};
 
 			try {
@@ -113,7 +109,7 @@ describe('Validator Domain', function() {
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
-				expect(err._errors.length).to.equal(4);
+				expect(err._errors.length).to.equal(3);
 				done();
 			}
 		});
@@ -122,8 +118,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
@@ -144,8 +139,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
@@ -166,8 +160,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
@@ -191,8 +184,7 @@ describe('Validator Domain', function() {
 			var options = {
 				namespace : 'ns://runrightfast.co/couchbase',
 				version : '1.0.0',
-				description : 'Couchbase config schema',
-				getObjectSchemaType : getObjectSchemaType
+				description : 'Couchbase config schema'
 			};
 
 			var schema = new ObjectSchema(options);
@@ -222,7 +214,7 @@ describe('Validator Domain', function() {
 			var type = new Type(options);
 			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.name);
-			expect(type.allowOtherKeys).to.equal(false);
+			expect(type.allowExtraKeys).to.equal(false);
 
 			try {
 				type = new Type();
@@ -232,17 +224,17 @@ describe('Validator Domain', function() {
 			}
 		});
 
-		it('must be constructed with a name, description, and allowOtherKeys', function() {
+		it('must be constructed with a name, description, and allowExtraKeys', function() {
 			var options = {
 				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
-				allowOtherKeys : true
+				allowExtraKeys : true
 			};
 
 			var type = new Type(options);
 			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.description);
-			expect(type.allowOtherKeys).to.equal(true);
+			expect(type.allowExtraKeys).to.equal(true);
 		});
 	});
 
@@ -259,8 +251,55 @@ describe('Validator Domain', function() {
 			expect(property.type).to.equal(options.type);
 
 			try {
-				type = new Property();
+				new Property();
 				done(new Property('Expected Error to be thrown because Property requires name and type'));
+			} catch (err) {
+				done();
+			}
+		});
+
+		it('can be constructed with type constraints', function(done) {
+			var options = {
+				name : 'port',
+				type : 'Number',
+				constraints : [ {
+					method : 'min',
+					args : [ 0 ]
+				}, {
+					method : 'max',
+					args : [ 10 ]
+				} ]
+			};
+
+			var property = new Property(options);
+			expect(property.name).to.equal(options.name);
+			expect(property.description).to.equal(options.name);
+			expect(property.type).to.equal(options.type);
+
+			try {
+				new Property();
+				done(new Property('Expected Error to be thrown because Property requires name and type'));
+			} catch (err) {
+				done();
+			}
+		});
+
+		it('can be constructed with type constraints that are valid', function(done) {
+			var options = {
+				name : 'port',
+				type : 'Number',
+				constraints : [ {
+					method : 'min',
+					args : [ 0 ]
+				}, {
+					method : 'maxXXX',
+					args : [ 10 ]
+				} ]
+			};
+
+			try {
+				new Property(options);
+				done(new Property('Expected Error to be thrown because Number.maxXXX is not a valid constraint'));
 			} catch (err) {
 				done();
 			}
