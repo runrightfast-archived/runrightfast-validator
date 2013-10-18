@@ -46,8 +46,9 @@ describe('Validator Domain', function() {
 			expect(lodash.isString(schema.id)).to.equal(true);
 			expect(lodash.isDate(schema.createdOn)).to.equal(true);
 			expect(lodash.isDate(schema.updatedOn)).to.equal(true);
+			expect(schema.id).to.equal(schema.namespace + '/' + schema.version);
 
-			console.log(schema);
+			console.log('*** schema json: ' + JSON.stringify(schema));
 		});
 
 		it('constructor options.namespace format must match pattern: ns://namespace', function(done) {
