@@ -572,6 +572,13 @@ describe('Validator Domain', function() {
 
 		});
 
+		/*
+		 * TODO: this test fails, which is why it is skipped. It is a defect in
+		 * Joi. According to its API, Joi should support heterogeneous Arrays,
+		 * but apparently it does not. An issue has been submitted to the Joi
+		 * project (https://github.com/spumko/joi/issues/133).
+		 * 
+		 */
 		it.skip('can validate that its elements only include certain types', function() {
 			var schema = {
 				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
