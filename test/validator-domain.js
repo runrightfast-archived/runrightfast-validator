@@ -17,6 +17,7 @@
 'use strict';
 var expect = require('chai').expect;
 var lodash = require('lodash');
+var joi = require('joi');
 
 var validatorDomain = require('..').validatorDomain;
 var ObjectSchema = validatorDomain.ObjectSchema;
@@ -250,7 +251,7 @@ describe('Validator Domain', function() {
 			}
 		});
 
-		it('can be constructed with a name, description, and properties', function(done) {
+		it.only('can be constructed with a name, description, and properties', function(done) {
 			var options = {
 				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
@@ -273,6 +274,37 @@ describe('Validator Domain', function() {
 							method : 'objectSchemaType',
 							args : [ 'ns://runrightfast.co', '1.0.0', 'Connection' ]
 						}, ]
+					},
+					alertEmails : {
+						name : 'alertEmails',
+						type : 'Array',
+						constraints : [ {
+							method : 'includes',
+							args : [ {
+								type : 'String',
+								constraints : [ {
+									method : 'min',
+									args : [ 10 ]
+								} ]
+							} ]
+						}, {
+							method : 'required',
+							args : []
+						} ]
+					},
+					connections : {
+						name : 'connections',
+						type : 'Array',
+						constraints : [ {
+							method : 'includes',
+							args : [ {
+								type : 'Object',
+								constraints : [ {
+									method : 'objectSchemaType',
+									args : [ 'ns://runrightfast.co', '1.0.0', 'Connection' ]
+								} ]
+							} ]
+						} ]
 					}
 				}
 			};
@@ -301,14 +333,40 @@ describe('Validator Domain', function() {
 									method : 'required',
 									args : []
 								} ]
+							},
+							emails : {
+								name : 'emails',
+								type : 'Array',
+								constraints : [ {
+									method : 'includes',
+									args : [ {
+										type : 'String',
+										constraints : [ {
+											method : 'min',
+											args : [ 10 ]
+										} ]
+									} ]
+								} ]
 							}
 						}
 					}
 				}
 			});
-			objectSchemaRegistry.registerSchema(objectSchema);
 
-			var type = new Type(options);
+			try {
+				objectSchemaRegistry.registerSchema(objectSchema);
+				console.log('+++ registered schema');
+			} catch (err) {
+				throw new Error('registerSchema failed : ' + err);
+			}
+
+			var type;
+			try {
+				type = new Type(options);
+			} catch (err) {
+				throw new Error('failed to create Type: ' + err);
+			}
+
 			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.description);
 
@@ -317,7 +375,8 @@ describe('Validator Domain', function() {
 			console.log(schema);
 
 			type.validate({
-				port : 8000
+				port : 8000,
+				alertEmails : [ 'azappala@email.com' ]
 			}, getObjectSchemaType);
 
 			type.validate({
@@ -325,12 +384,43 @@ describe('Validator Domain', function() {
 				connection : {
 					host : 'localhost',
 					port : 8091
-				}
+				},
+				alertEmails : [ 'azappala@email.com' ]
+			}, getObjectSchemaType);
+
+			type.validate({
+				port : 8000,
+				connection : {
+					host : 'localhost',
+					port : 8091
+				},
+				alertEmails : [ 'azappala@email.com' ],
+				connections : [ {
+					host : 'localhost',
+					port : 8091
+				}, {
+					host : 'localhost',
+					port : 8092
+				} ]
 			}, getObjectSchemaType);
 
 			try {
+				type.validate({
+					port : 8000,
+					connection : {
+						host : 'localhost',
+						port : 8091
+					}
+				}, getObjectSchemaType);
+				done(new Error('Expected validation to fail because alertEmails is required'));
+				return;
+			} catch (err) {
+				console.log(err);
+			}
+
+			try {
 				type.validate({}, getObjectSchemaType);
-				done(new Error('Expected validation to faile because port is required'));
+				done(new Error('Expected validation to fail because port is required'));
 				return;
 			} catch (err) {
 				console.log(err);
@@ -338,7 +428,8 @@ describe('Validator Domain', function() {
 
 			try {
 				type.validate({
-					port : 'asdasd'
+					port : 'asdasd',
+					alertEmails : [ 'azappala@email.com' ]
 				}, getObjectSchemaType);
 				done(new Error('Expected validation to faile because port must be a number'));
 				return;
@@ -351,7 +442,8 @@ describe('Validator Domain', function() {
 					port : 8000,
 					connection : {
 						port : 8091
-					}
+					},
+					alertEmails : [ 'azappala@email.com' ]
 				}, getObjectSchemaType);
 				done(new Error('Expected validation to faile because connection.host is required'));
 				return;
@@ -443,6 +535,80 @@ describe('Validator Domain', function() {
 				console.log(err);
 				done();
 			}
+		});
+
+	});
+
+	describe('typesRegistry', function() {
+		it('lists the types that are supported and the constraint functions each type supports', function() {
+			var typesRegistry = validatorDomain.typesRegistry;
+			// console.log('typesRegistry:\n' + JSON.stringify(typesRegistry,
+			// undefined, 2));
+		});
+
+	});
+
+	describe('Joi Array Type', function() {
+		it('can validate that its elements only include certain types', function() {
+			var schema = {
+				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
+			};
+
+			var obj = {
+				array : [ '12345' ]
+			};
+			var err = joi.validate(obj, schema);
+			if (err) {
+				throw new Error(JSON.stringify(obj) + '\n' + err);
+			}
+
+			obj = {
+				array : [ '1234' ]
+			};
+			err = joi.validate(obj, schema);
+			if (!err) {
+				throw new Error(JSON.stringify(obj) + '\n Should be invalid because it contains a String with length < 5');
+			}
+
+		});
+
+		it.skip('can validate that its elements only include certain types', function() {
+			var schema = {
+				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
+			};
+
+			var obj = {
+				array : [ '12345' ]
+			};
+			var err = joi.validate(obj, schema);
+			if (err) {
+				throw new Error(JSON.stringify(obj) + '\n' + err);
+			}
+
+			obj = {
+				array : [ '1234' ]
+			};
+			err = joi.validate(obj, schema);
+			if (!err) {
+				throw new Error(JSON.stringify(obj) + '\n Should be invalid because it contains a String with length < 5');
+			}
+
+			obj = {
+				array : [ 3 ]
+			};
+			err = joi.validate(obj, schema);
+			if (err) {
+				throw new Error(JSON.stringify(obj) + '\n' + err);
+			}
+
+			obj = {
+				array : [ '12345', 3 ]
+			};
+			err = joi.validate(obj, schema);
+			if (err) {
+				throw new Error(JSON.stringify(obj) + '\n' + err);
+			}
+
 		});
 
 	});
