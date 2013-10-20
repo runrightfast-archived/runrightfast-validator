@@ -1,7 +1,7 @@
 {
 	"name":"runrightfast-validator",
-	"version":"0.0.6",
-	"description":"RunRightFast Logging Client",
+	"version":"0.0.7",
+	"description":"RunRightFast Validator",
 	"repository":{
 		"type":"git",
 		"url":"https://github.com/runrightfast/runrightfast-validator.git"
@@ -20,7 +20,7 @@
 	"dependencies":{
 		"lodash":"2.2.x",
 		"hoek":"1.1.x",		
-		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.13",		
+		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.14",		
 		"log4js":"0.6.x",	
 		"joi":"1.2.x",
 		"extend":"1.2.x"
