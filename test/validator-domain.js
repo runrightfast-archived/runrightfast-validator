@@ -579,17 +579,19 @@ describe('Validator Domain', function() {
 		 * project (https://github.com/spumko/joi/issues/133).
 		 * 
 		 */
-		it.skip('can validate that its elements only include certain types', function() {
+		it.skip('can validate that its elements only include certain types', function(done) {
 			var schema = {
 				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
 			};
+
+			var errors = [];
 
 			var obj = {
 				array : [ '12345' ]
 			};
 			var err = joi.validate(obj, schema);
 			if (err) {
-				throw new Error(JSON.stringify(obj) + '\n' + err);
+				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
 			}
 
 			obj = {
@@ -597,7 +599,7 @@ describe('Validator Domain', function() {
 			};
 			err = joi.validate(obj, schema);
 			if (!err) {
-				throw new Error(JSON.stringify(obj) + '\n Should be invalid because it contains a String with length < 5');
+				errors.push(new Error(JSON.stringify(obj) + ' : Should be invalid because it contains a String with length < 5'));
 			}
 
 			obj = {
@@ -605,7 +607,7 @@ describe('Validator Domain', function() {
 			};
 			err = joi.validate(obj, schema);
 			if (err) {
-				throw new Error(JSON.stringify(obj) + '\n' + err);
+				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
 			}
 
 			obj = {
@@ -613,7 +615,13 @@ describe('Validator Domain', function() {
 			};
 			err = joi.validate(obj, schema);
 			if (err) {
-				throw new Error(JSON.stringify(obj) + '\n' + err);
+				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
+			}
+
+			if (errors.length > 0) {
+				done(new Error(errors));
+			} else {
+				done();
 			}
 
 		});
