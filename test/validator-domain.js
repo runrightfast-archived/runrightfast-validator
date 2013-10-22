@@ -580,8 +580,12 @@ describe('Validator Domain', function() {
 		 * 
 		 */
 		it.skip('can validate that its elements only include certain types', function(done) {
-			var schema = {
+			var schema1 = {
 				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
+			};
+
+			var schema2 = {
+				array : joi.types.Array().includes(joi.types.Number().min(0), joi.types.String().min(5))
 			};
 
 			var errors = [];
@@ -589,37 +593,53 @@ describe('Validator Domain', function() {
 			var obj = {
 				array : [ '12345' ]
 			};
-			var err = joi.validate(obj, schema);
+			var err = joi.validate(obj, schema1);
 			if (err) {
-				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
+				errors.push(new Error(JSON.stringify(obj) + ' : schema1 : ' + err));
+			}
+			err = joi.validate(obj, schema2);
+			if (err) {
+				errors.push(new Error(JSON.stringify(obj) + ' : schema2 : ' + err));
 			}
 
 			obj = {
 				array : [ '1234' ]
 			};
-			err = joi.validate(obj, schema);
+			err = joi.validate(obj, schema1);
 			if (!err) {
-				errors.push(new Error(JSON.stringify(obj) + ' : Should be invalid because it contains a String with length < 5'));
+				errors.push(new Error(JSON.stringify(obj) + ' : schema1 : Should be invalid because it contains a String with length < 5'));
+			}
+			err = joi.validate(obj, schema2);
+			if (!err) {
+				errors.push(new Error(JSON.stringify(obj) + ' : schema2 : Should be invalid because it contains a String with length < 5'));
 			}
 
 			obj = {
 				array : [ 3 ]
 			};
-			err = joi.validate(obj, schema);
+			err = joi.validate(obj, schema1);
 			if (err) {
-				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
+				errors.push(new Error(JSON.stringify(obj) + ' : schema1 : ' + err));
+			}
+			err = joi.validate(obj, schema2);
+			if (err) {
+				errors.push(new Error(JSON.stringify(obj) + ' : schema2 : ' + err));
 			}
 
 			obj = {
 				array : [ '12345', 3 ]
 			};
-			err = joi.validate(obj, schema);
+			err = joi.validate(obj, schema1);
 			if (err) {
-				errors.push(new Error(JSON.stringify(obj) + ' : ' + err));
+				errors.push(new Error(JSON.stringify(obj) + ' : schema1 : ' + err));
+			}
+			err = joi.validate(obj, schema2);
+			if (err) {
+				errors.push(new Error(JSON.stringify(obj) + ' : schema2 : ' + err));
 			}
 
 			if (errors.length > 0) {
-				done(new Error(errors));
+				done(new Error(errors.join('\n')));
 			} else {
 				done();
 			}
