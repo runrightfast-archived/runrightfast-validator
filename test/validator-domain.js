@@ -48,6 +48,7 @@ describe('Validator Domain', function() {
 			expect(lodash.isDate(schema.createdOn)).to.equal(true);
 			expect(lodash.isDate(schema.updatedOn)).to.equal(true);
 			expect(schema.id).to.equal(schema.namespace + '/' + schema.version);
+			expect(schema._entityType).to.equal('ns://runrightfast-validator/ObjectSchema');
 
 			console.log('*** schema json: ' + JSON.stringify(schema));
 		});
@@ -205,6 +206,56 @@ describe('Validator Domain', function() {
 			expect(schema.getType(type.name).description).equal(type2.description);
 
 		});
+
+		it('validates that Array properties reference valid types', function(done) {
+			try {
+				new ObjectSchema({
+					namespace : 'ns://runrightfast.co',
+					version : '1.0.0',
+					description : 'Couchbase config schema',
+					types : {
+						Connection : {
+							name : 'Connection',
+							description : 'Connection Settings',
+							properties : {
+								emails : {
+									name : 'emails',
+									type : 'Array',
+									constraints : [ {
+										method : 'includes',
+										args : [ {
+											type : 'String',
+											constraints : [ {
+												method : 'email',
+												args : []
+											} ]
+										} ]
+									} ]
+								},
+								invalidProperty : {
+									name : 'emails',
+									type : 'Array',
+									constraints : [ {
+										method : 'includes',
+										args : [ {
+											type : 'INVALID_TYPE',
+											constraints : [ {
+												method : 'email',
+												args : []
+											} ]
+										} ]
+									} ]
+								}
+							}
+						}
+					}
+				});
+				done(new Error('expected error because invalidProperty Array type includes an invalid type'));
+			} catch (err) {
+				console.log(err);
+				done();
+			}
+		});
 	});
 
 	describe('Type', function() {
@@ -251,7 +302,7 @@ describe('Validator Domain', function() {
 			}
 		});
 
-		it.only('can be constructed with a name, description, and properties', function(done) {
+		it('can be constructed with a name, description, and properties', function(done) {
 			var options = {
 				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
@@ -273,7 +324,10 @@ describe('Validator Domain', function() {
 						constraints : [ {
 							method : 'objectSchemaType',
 							args : [ 'ns://runrightfast.co', '1.0.0', 'Connection' ]
-						}, ]
+						}, {
+							method : 'optional',
+							args : []
+						} ]
 					},
 					alertEmails : {
 						name : 'alertEmails',
@@ -283,8 +337,8 @@ describe('Validator Domain', function() {
 							args : [ {
 								type : 'String',
 								constraints : [ {
-									method : 'min',
-									args : [ 10 ]
+									method : 'email',
+									args : []
 								} ]
 							} ]
 						}, {
@@ -342,8 +396,8 @@ describe('Validator Domain', function() {
 									args : [ {
 										type : 'String',
 										constraints : [ {
-											method : 'min',
-											args : [ 10 ]
+											method : 'email',
+											args : []
 										} ]
 									} ]
 								} ]
@@ -415,7 +469,18 @@ describe('Validator Domain', function() {
 				done(new Error('Expected validation to fail because alertEmails is required'));
 				return;
 			} catch (err) {
-				console.log(err);
+				console.log('Expected validation to fail because alertEmails is required: ' + err);
+			}
+
+			try {
+				type.validate({
+					port : 8000,
+					alertEmails : [ 'azappala@email.com', 'invalid email' ]
+				}, getObjectSchemaType);
+				done(new Error('Expected validation to fail because alertEmails contains invalid emails'));
+				return;
+			} catch (err) {
+				console.log('Expected validation to fail because alertEmails contains invalid emails: ' + err);
 			}
 
 			try {
@@ -423,7 +488,7 @@ describe('Validator Domain', function() {
 				done(new Error('Expected validation to fail because port is required'));
 				return;
 			} catch (err) {
-				console.log(err);
+				console.log('Expected validation to fail because port is required: ' + err);
 			}
 
 			try {
@@ -434,7 +499,7 @@ describe('Validator Domain', function() {
 				done(new Error('Expected validation to faile because port must be a number'));
 				return;
 			} catch (err) {
-				console.log(err);
+				console.log('Expected validation to faile because port must be a number: ' + err);
 			}
 
 			try {
@@ -448,7 +513,7 @@ describe('Validator Domain', function() {
 				done(new Error('Expected validation to faile because connection.host is required'));
 				return;
 			} catch (err) {
-				console.log(err);
+				console.log('Expected validation to faile because connection.host is required: ' + err);
 			}
 
 			done();
@@ -542,8 +607,7 @@ describe('Validator Domain', function() {
 	describe('typesRegistry', function() {
 		it('lists the types that are supported and the constraint functions each type supports', function() {
 			var typesRegistry = validatorDomain.typesRegistry;
-			// console.log('typesRegistry:\n' + JSON.stringify(typesRegistry,
-			// undefined, 2));
+			console.log('typesRegistry:\n' + JSON.stringify(typesRegistry, undefined, 2));
 		});
 
 	});
