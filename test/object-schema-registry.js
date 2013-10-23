@@ -26,6 +26,7 @@ var validatorDomain = require('..').validatorDomain;
 var ObjectSchema = validatorDomain.ObjectSchema;
 var Type = validatorDomain.Type;
 var Property = validatorDomain.Property;
+var utils = require('..').utils;
 
 describe('ObjectSchemaRegistry', function() {
 	it('provide a default in memory implementation', function() {
