@@ -37,9 +37,7 @@ describe('ObjectSchemaRegistry', function() {
 			version : '1.1.1',
 			description : 'RunRightFast Object Schema',
 			types : {
-				ConnectionConfig : {
-					name : 'ConnectionConfig'
-				}
+				ConnectionConfig : {}
 			}
 		});
 		registry.registerSchema(objectSchema);
@@ -60,9 +58,7 @@ describe('ObjectSchemaRegistry', function() {
 			version : '1.1.1',
 			description : 'RunRightFast Object Schema',
 			types : {
-				ConnectionConfig : {
-					name : 'ConnectionConfig'
-				}
+				ConnectionConfig : {}
 			}
 		});
 		registry.registerSchema(objectSchema);

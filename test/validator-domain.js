@@ -128,14 +128,14 @@ describe('Validator Domain', function() {
 			var typeNames = schema.getTypeNames();
 			expect(lodash.size(typeNames)).to.equal(0);
 
+			var name = 'CouchbaseConnectionSettings';
 			var type = new Type({
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings'
 			});
 
-			schema.addType(type);
-			expect(schema.getType(type.name)).to.exist;
-			expect(lodash.contains(schema.getTypeNames(), type.name)).to.equal(true);
+			schema.addType(name, type);
+			expect(schema.getType(name)).to.exist;
+			expect(lodash.contains(schema.getTypeNames(), name)).to.equal(true);
 		});
 
 		it('can remove a Type by name', function() {
@@ -147,16 +147,16 @@ describe('Validator Domain', function() {
 
 			var schema = new ObjectSchema(options);
 
+			var name = 'CouchbaseConnectionSettings';
 			var type = new Type({
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings'
 			});
 
-			schema.addType(type);
-			expect(schema.getType(type.name)).to.exist;
-			expect(lodash.contains(schema.getTypeNames(), type.name)).to.equal(true);
-			var removedType = schema.removeType(type.name);
-			expect(removedType.name).to.equal(type.name);
+			schema.addType(name, type);
+			expect(schema.getType(name)).to.exist;
+			expect(lodash.contains(schema.getTypeNames(), name)).to.equal(true);
+			var removedType = schema.removeType(name);
+			expect(removedType).to.exist;
 		});
 
 		it('a type with same name cannot be added twice', function(done) {
@@ -168,15 +168,15 @@ describe('Validator Domain', function() {
 
 			var schema = new ObjectSchema(options);
 
+			var name = 'CouchbaseConnectionSettings';
 			var type = new Type({
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings'
 			});
 
-			schema.addType(type);
+			schema.addType(name, type);
 
 			try {
-				schema.addType(type);
+				schema.addType(name, type);
 				done(new Error('expected an Error to be thrown because a type with the same name already exists'));
 			} catch (err) {
 				done();
@@ -192,18 +192,17 @@ describe('Validator Domain', function() {
 
 			var schema = new ObjectSchema(options);
 
+			var name = 'CouchbaseConnectionSettings';
 			var type = new Type({
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings'
 			});
 
-			schema.addType(type);
+			schema.addType(name, type);
 			var type2 = new Type({
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings - 2'
 			});
-			schema.setType(type2);
-			expect(schema.getType(type.name).description).equal(type2.description);
+			schema.setType(name, type2);
+			expect(schema.getType(name).description).equal(type2.description);
 
 		});
 
@@ -215,11 +214,9 @@ describe('Validator Domain', function() {
 					description : 'Couchbase config schema',
 					types : {
 						Connection : {
-							name : 'Connection',
 							description : 'Connection Settings',
 							properties : {
 								emails : {
-									name : 'emails',
 									type : 'Array',
 									constraints : [ {
 										method : 'includes',
@@ -233,7 +230,6 @@ describe('Validator Domain', function() {
 									} ]
 								},
 								invalidProperty : {
-									name : 'emails',
 									type : 'Array',
 									constraints : [ {
 										method : 'includes',
@@ -259,33 +255,14 @@ describe('Validator Domain', function() {
 	});
 
 	describe('Type', function() {
-		it('must be constructed with a name', function(done) {
+
+		it('can be constructed with a description and allowExtraKeys', function(done) {
 			var options = {
-				name : 'CouchbaseConnectionSettings'
-			};
-
-			var type = new Type(options);
-			expect(type.name).to.equal(options.name);
-			expect(type.description).to.equal(options.name);
-			expect(type.allowExtraKeys).to.equal(false);
-
-			try {
-				type = new Type();
-				done(new Error('Expected Error to be thrown because Type requires name'));
-			} catch (err) {
-				done();
-			}
-		});
-
-		it('can be constructed with a name, description, and allowExtraKeys', function(done) {
-			var options = {
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
 				allowExtraKeys : true
 			};
 
 			var type = new Type(options);
-			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.description);
 			expect(type.allowExtraKeys).to.equal(options.allowExtraKeys);
 
@@ -302,13 +279,11 @@ describe('Validator Domain', function() {
 			}
 		});
 
-		it('can be constructed with a name, description, and properties', function(done) {
+		it('can be constructed with a  description, and properties', function(done) {
 			var options = {
-				name : 'CouchbaseConnectionSettings',
 				description : 'Couchbase Connection Settings',
 				properties : {
 					port : {
-						name : 'port',
 						type : 'Number',
 						constraints : [ {
 							method : 'required',
@@ -319,7 +294,6 @@ describe('Validator Domain', function() {
 						} ]
 					},
 					connection : {
-						name : 'connection',
 						type : 'Object',
 						constraints : [ {
 							method : 'objectSchemaType',
@@ -330,7 +304,6 @@ describe('Validator Domain', function() {
 						} ]
 					},
 					alertEmails : {
-						name : 'alertEmails',
 						type : 'Array',
 						constraints : [ {
 							method : 'includes',
@@ -347,7 +320,6 @@ describe('Validator Domain', function() {
 						} ]
 					},
 					connections : {
-						name : 'connections',
 						type : 'Array',
 						constraints : [ {
 							method : 'includes',
@@ -369,11 +341,9 @@ describe('Validator Domain', function() {
 				description : 'Couchbase config schema',
 				types : {
 					Connection : {
-						name : 'Connection',
 						description : 'Connection Settings',
 						properties : {
 							port : {
-								name : 'port',
 								type : 'Number',
 								constraints : [ {
 									method : 'required',
@@ -381,7 +351,6 @@ describe('Validator Domain', function() {
 								} ]
 							},
 							host : {
-								name : 'host',
 								type : 'String',
 								constraints : [ {
 									method : 'required',
@@ -389,7 +358,6 @@ describe('Validator Domain', function() {
 								} ]
 							},
 							emails : {
-								name : 'emails',
 								type : 'Array',
 								constraints : [ {
 									method : 'includes',
@@ -421,7 +389,6 @@ describe('Validator Domain', function() {
 				throw new Error('failed to create Type: ' + err);
 			}
 
-			expect(type.name).to.equal(options.name);
 			expect(type.description).to.equal(options.description);
 
 			var schema = type.getSchema(getObjectSchemaType);
@@ -521,20 +488,18 @@ describe('Validator Domain', function() {
 	});
 
 	describe('Property', function() {
-		it('must be constructed with a name and type', function(done) {
+		it('must be constructed with a type', function(done) {
 			var options = {
-				name : 'port',
 				type : 'Number'
 			};
 
 			var property = new Property(options);
-			expect(property.name).to.equal(options.name);
 			expect(property.description).to.equal(options.name);
 			expect(property.type).to.equal(options.type);
 
 			try {
 				new Property();
-				done(new Property('Expected Error to be thrown because Property requires name and type'));
+				done(new Property('Expected Error to be thrown because Property requires type'));
 			} catch (err) {
 				done();
 			}
@@ -542,7 +507,6 @@ describe('Validator Domain', function() {
 
 		it('can be constructed with type constraints', function(done) {
 			var options = {
-				name : 'port',
 				type : 'Number',
 				constraints : [ {
 					method : 'min',
@@ -554,13 +518,11 @@ describe('Validator Domain', function() {
 			};
 
 			var property = new Property(options);
-			expect(property.name).to.equal(options.name);
-			expect(property.description).to.equal(options.name);
 			expect(property.type).to.equal(options.type);
 
 			try {
 				new Property();
-				done(new Property('Expected Error to be thrown because Property requires name and type'));
+				done(new Property('Expected Error to be thrown because Property requires type'));
 			} catch (err) {
 				done();
 			}
@@ -568,7 +530,6 @@ describe('Validator Domain', function() {
 
 		it('can be constructed with type constraints that are valid', function(done) {
 			var options = {
-				name : 'port',
 				type : 'Number',
 				constraints : [ {
 					method : 'min',
@@ -589,7 +550,6 @@ describe('Validator Domain', function() {
 
 		it('must be constructed with a name and type that is supported', function(done) {
 			var options = {
-				name : 'port',
 				type : 'SDFSDFF'
 			};
 
@@ -615,7 +575,7 @@ describe('Validator Domain', function() {
 	describe('Joi Array Type', function() {
 		it('can validate that its elements only include certain types', function() {
 			var schema = {
-				array : joi.types.Array().includes(joi.types.String().min(5), joi.types.Number().min(0))
+				array : joi.types.Array().includes(joi.types.String().min(5))
 			};
 
 			var obj = {
@@ -632,6 +592,14 @@ describe('Validator Domain', function() {
 			err = joi.validate(obj, schema);
 			if (!err) {
 				throw new Error(JSON.stringify(obj) + '\n Should be invalid because it contains a String with length < 5');
+			}
+
+			obj = {
+				array : [ 12345 ]
+			};
+			err = joi.validate(obj, schema);
+			if (!err) {
+				throw new Error(JSON.stringify(obj) + '\n Should be invalid because it contains an invalid type');
 			}
 
 		});
@@ -710,12 +678,48 @@ describe('Validator Domain', function() {
 
 		});
 
-//		it('should validate array of mixed Numbers & Strings', function(done) {
-//			var A = joi.types.Array, N = Joi.types.Number, S = Joi.types.String, O = Joi.types.Object;
-//
-//			verifyBehavior(A().includes(N(), S()), [ [ [ 1, 2, 3 ], true ], [ [ 50, 100, 1000 ], true ], [ [ 1, 'a', 5, 10 ], true ],
-//					[ [ 'walmart', 'everydaylowprices', 5000 ], true ] ], done);
-//		});
+		/*
+		 * TODO: this test fails, which is why it is skipped. It is a defect in
+		 * Joi. According to its API, Joi should support heterogeneous Arrays,
+		 * but apparently it does not. An issue has been submitted to the Joi
+		 * project (https://github.com/spumko/joi/issues/133).
+		 */
+		it.skip('should validate array of mixed Numbers & Strings', function() {
+			var A = joi.types.Array, N = joi.types.Number, S = joi.types.String;
+
+			var schema = {
+				a : A().includes(N(), S())
+			};
+			var error;
+			error = joi.validate({
+				a : [ 1, 2, 3 ]
+			}, schema);
+			if (error) {
+				throw new Error('[ 1, 2, 3 ]: ' + error);
+			}
+
+			error = joi.validate({
+				a : [ 50, 100, 1000 ]
+			}, schema);
+			if (error) {
+				throw new Error('[ 50, 100, 1000 ]:' + error);
+			}
+
+			error = joi.validate({
+				a : [ 1, 'a', 5, 10 ]
+			}, schema);
+			if (error) {
+				throw new Error("[ 1, 'a', 5, 10 ]: " + error);
+			}
+
+			error = joi.validate({
+				a : [ 'walmart', 'everydaylowprices', 5000 ]
+			}, schema);
+			if (error) {
+				throw new Error("[ 'walmart', 'everydaylowprices', 5000 ]: " + error);
+			}
+
+		});
 
 	});
 
