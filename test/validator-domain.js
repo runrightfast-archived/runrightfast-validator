@@ -710,6 +710,13 @@ describe('Validator Domain', function() {
 
 		});
 
+//		it('should validate array of mixed Numbers & Strings', function(done) {
+//			var A = joi.types.Array, N = Joi.types.Number, S = Joi.types.String, O = Joi.types.Object;
+//
+//			verifyBehavior(A().includes(N(), S()), [ [ [ 1, 2, 3 ], true ], [ [ 50, 100, 1000 ], true ], [ [ 1, 'a', 5, 10 ], true ],
+//					[ [ 'walmart', 'everydaylowprices', 5000 ], true ] ], done);
+//		});
+
 	});
 
 });
