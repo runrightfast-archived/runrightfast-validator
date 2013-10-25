@@ -676,7 +676,16 @@ describe('Validator Domain', function() {
 			console.log(dependencies);
 			expect(dependencies.length).to.equal(2);
 
+			options.properties.connection2.constraints = options.properties.connection1.constraints;
+
+			type = new Type(options);
+
+			dependencies = type.getObjectSchemaTypeDependencies();
+			console.log(dependencies);
+			expect(dependencies.length).to.equal(1);
+
 		});
+
 	});
 
 	describe('Property', function() {
