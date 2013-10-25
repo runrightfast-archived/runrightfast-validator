@@ -252,6 +252,119 @@ describe('Validator Domain', function() {
 				done();
 			}
 		});
+
+		it('Object properties are allowed to have typeArgs', function(done) {
+
+			var objectSchema = new ObjectSchema({
+				namespace : 'ns://runrightfast.co',
+				version : '1.0.0',
+				description : 'Couchbase config schema',
+				types : {
+					CouchbaseConfig : {
+						description : 'Couchbase Connection Configuration',
+						properties : {
+							conn : {
+								type : 'Object',
+								typeArgs : [ {
+									description : 'Connection Settings',
+									properties : {
+										host : {
+											type : 'String',
+											constraints : [ {
+												method : 'required',
+												args : []
+											} ]
+										},
+										port : {
+											type : 'Number',
+											constraints : [ {
+												method : 'required',
+												args : []
+											}, {
+												method : 'min',
+												args : [ 0 ]
+											} ]
+										}
+									}
+								} ]
+							}
+						}
+					}
+				}
+			});
+
+			console.log('objectSchema :\n' + JSON.stringify(objectSchema, undefined, 2));
+
+			var couchbaseConfig = objectSchema.getType('CouchbaseConfig');
+
+			couchbaseConfig.validate({
+				conn : {
+					host : 'localhost',
+					port : 8091
+				}
+			});
+
+			try {
+				couchbaseConfig.validate({
+					conn : {
+						host : 'localhost'
+					}
+				});
+				done(new Error('expected validation to fail because conn.port is required'));
+			} catch (err) {
+				console.log(err);
+				done();
+			}
+
+		});
+
+		it('Only Object properties are allowed to have typeArgs', function(done) {
+
+			try {
+				new ObjectSchema({
+					namespace : 'ns://runrightfast.co',
+					version : '1.0.0',
+					description : 'Couchbase config schema',
+					types : {
+						CouchbaseConfig : {
+							description : 'Couchbase Connection Configuration',
+							properties : {
+								conn : {
+									type : 'String',
+									typeArgs : [ {
+										description : 'Connection Settings',
+										properties : {
+											host : {
+												type : 'String',
+												constraints : [ {
+													method : 'required',
+													args : []
+												} ]
+											},
+											port : {
+												type : 'Number',
+												constraints : [ {
+													method : 'required',
+													args : []
+												}, {
+													method : 'min',
+													args : [ 0 ]
+												} ]
+											}
+										}
+									} ]
+								}
+							}
+						}
+					}
+				});
+
+				done(new Error('expected validation to fail'));
+			} catch (err) {
+				console.log(err);
+				done();
+			}
+		});
 	});
 
 	describe('Type', function() {
@@ -484,6 +597,85 @@ describe('Validator Domain', function() {
 			}
 
 			done();
+		});
+
+		it('validation will fail if a reference ObjectSchema Type cannot be retrieved', function(done) {
+			var options = {
+				description : 'Couchbase Connection Settings',
+				properties : {
+					connection : {
+						type : 'Object',
+						constraints : [ {
+							method : 'objectSchemaType',
+							args : [ 'ns://DOES_NOT_EXIST', '1.0.0', 'Connection' ]
+						}, {
+							method : 'required',
+							args : []
+						} ]
+					}
+				}
+			};
+
+			var type;
+			try {
+				type = new Type(options);
+			} catch (err) {
+				throw new Error('failed to create Type: ' + err);
+			}
+
+			expect(type.description).to.equal(options.description);
+
+			var schema = type.getSchema(getObjectSchemaType);
+			expect(schema).to.exist;
+			console.log(schema);
+
+			try {
+				type.validate({
+					connection : {
+						host : 'localhost',
+						port : 8091
+					}
+				}, getObjectSchemaType);
+				done(new Error('Expected validation to fail'));
+			} catch (err) {
+				console.log(err);
+				done();
+			}
+		});
+
+		it('#getSchemaDependencies returns the ObjectSchemas that a Type depends on', function() {
+			var options = {
+				description : 'Couchbase Connection Settings',
+				properties : {
+					connection1 : {
+						type : 'Object',
+						constraints : [ {
+							method : 'objectSchemaType',
+							args : [ 'ns://schema-1', '1.0.0', 'Connection' ]
+						}, {
+							method : 'required',
+							args : []
+						} ]
+					},
+					connection2 : {
+						type : 'Object',
+						constraints : [ {
+							method : 'objectSchemaType',
+							args : [ 'ns://schema-2', '1.0.0', 'Connection' ]
+						}, {
+							method : 'required',
+							args : []
+						} ]
+					}
+				}
+			};
+
+			var type = new Type(options);
+
+			var dependencies = type.getObjectSchemaTypeDependencies();
+			console.log(dependencies);
+			expect(dependencies.length).to.equal(2);
+
 		});
 	});
 
