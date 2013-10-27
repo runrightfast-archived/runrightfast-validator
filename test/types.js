@@ -15,7 +15,33 @@
  */
 'use strict';
 
-module.exports.validatorDomain = require('./validator-domain');
-module.exports.ObjectSchemaRegistry = require('./object-schema-registry');
-module.exports.utils = require('./utils');
-module.exports.types = require('./types');
+var expect = require('chai').expect;
+var lodash = require('lodash');
+
+var DateType = require('..').types.DateType;
+var joi = require('joi');
+
+describe('DateType', function() {
+	it('validates that objects are Dates', function() {
+		var schema = {
+			date : DateType()
+		};
+
+		var error = joi.validate({
+			date : new Date()
+		}, schema);
+
+		console.log(error);
+
+		expect(error).to.not.exist;
+
+		error = joi.validate({
+			date : 'NOT A DATE'
+		}, schema);
+
+		console.log(error);
+
+		expect(error).to.exist;
+	});
+
+});
