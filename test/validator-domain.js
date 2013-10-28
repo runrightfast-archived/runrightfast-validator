@@ -47,7 +47,7 @@ describe('Validator Domain', function() {
 			expect(lodash.isString(schema.id)).to.equal(true);
 			expect(lodash.isDate(schema.createdOn)).to.equal(true);
 			expect(lodash.isDate(schema.updatedOn)).to.equal(true);
-			expect(schema.id).to.equal(schema.namespace + '/' + schema.version);
+			expect(schema.id).to.exist;
 			expect(schema._entityType).to.equal('ns://runrightfast-validator/ObjectSchema');
 
 			console.log('*** schema json: ' + JSON.stringify(schema));
