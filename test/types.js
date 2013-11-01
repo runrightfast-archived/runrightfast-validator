@@ -18,22 +18,22 @@
 var expect = require('chai').expect;
 var lodash = require('lodash');
 
-var DateType = require('..').types.DateType;
+var date = require('..').types.DateType;
 var joi = require('joi');
 
 describe('DateType', function() {
-	it('validates that objects are Dates', function() {
+	it.only('validates that objects are Dates', function() {
 		var schema = {
-			date : DateType()
+			date : date()
 		};
 
 		var error = joi.validate({
 			date : new Date()
 		}, schema);
 
-		console.log(error);
+		console.log('error : ' + error);
 
-		expect(error).to.not.exist;
+		expect(!!error).to.equal(false);
 
 		error = joi.validate({
 			date : 'NOT A DATE'
@@ -41,7 +41,7 @@ describe('DateType', function() {
 
 		console.log(error);
 
-		expect(error).to.exist;
+		expect(!!error).to.equal(true);
 	});
 
 });

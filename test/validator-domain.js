@@ -41,13 +41,13 @@ describe('Validator Domain', function() {
 			var schema = new ObjectSchema(options);
 			expect(schema.namespace).to.equal(options.namespace);
 			expect(schema.version).to.equal(options.version);
-			expect(schema.id).to.exist;
-			expect(schema.createdOn).to.exist;
-			expect(schema.updatedOn).to.exist;
+			expect(!!schema.id).to.equal(true);
+			expect(!!schema.createdOn).to.equal(true);
+			expect(!!schema.updatedOn).to.equal(true);
 			expect(lodash.isString(schema.id)).to.equal(true);
 			expect(lodash.isDate(schema.createdOn)).to.equal(true);
 			expect(lodash.isDate(schema.updatedOn)).to.equal(true);
-			expect(schema.id).to.exist;
+			expect(!!schema.id).to.equal(true);
 			expect(schema._entityType).to.equal('ns://runrightfast-validator/ObjectSchema');
 
 			console.log('*** schema json: ' + JSON.stringify(schema));
@@ -61,7 +61,7 @@ describe('Validator Domain', function() {
 			};
 
 			try {
-				new ObjectSchema(options);
+				console.log(new ObjectSchema(options));
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
@@ -79,7 +79,7 @@ describe('Validator Domain', function() {
 			};
 
 			try {
-				new ObjectSchema(options);
+				console.log(new ObjectSchema(options));
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
@@ -96,7 +96,7 @@ describe('Validator Domain', function() {
 			};
 
 			try {
-				new ObjectSchema(options);
+				console.log(new ObjectSchema(options));
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
@@ -108,7 +108,7 @@ describe('Validator Domain', function() {
 
 		it('constructor options are required', function(done) {
 			try {
-				new ObjectSchema();
+				console.log(new ObjectSchema());
 				done(new Error('expected validation error'));
 			} catch (err) {
 				console.log(err);
@@ -134,7 +134,7 @@ describe('Validator Domain', function() {
 			});
 
 			schema.addType(name, type);
-			expect(schema.getType(name)).to.exist;
+			expect(lodash.isObject(schema.getType(name))).to.equal(true);
 			expect(lodash.contains(schema.getTypeNames(), name)).to.equal(true);
 		});
 
@@ -153,10 +153,10 @@ describe('Validator Domain', function() {
 			});
 
 			schema.addType(name, type);
-			expect(schema.getType(name)).to.exist;
+			expect(lodash.isObject(schema.getType(name))).to.equal(true);
 			expect(lodash.contains(schema.getTypeNames(), name)).to.equal(true);
 			var removedType = schema.removeType(name);
-			expect(removedType).to.exist;
+			expect(lodash.isObject(removedType)).to.equal(true);
 		});
 
 		it('a type with same name cannot be added twice', function(done) {
@@ -208,7 +208,7 @@ describe('Validator Domain', function() {
 
 		it('validates that Array properties reference valid types', function(done) {
 			try {
-				new ObjectSchema({
+				console.log(new ObjectSchema({
 					namespace : 'ns://runrightfast.co',
 					version : '1.0.0',
 					description : 'Couchbase config schema',
@@ -245,7 +245,7 @@ describe('Validator Domain', function() {
 							}
 						}
 					}
-				});
+				}));
 				done(new Error('expected error because invalidProperty Array type includes an invalid type'));
 			} catch (err) {
 				console.log(err);
@@ -321,7 +321,7 @@ describe('Validator Domain', function() {
 		it('Only Object properties are allowed to have typeArgs', function(done) {
 
 			try {
-				new ObjectSchema({
+				console.log(new ObjectSchema({
 					namespace : 'ns://runrightfast.co',
 					version : '1.0.0',
 					description : 'Couchbase config schema',
@@ -357,7 +357,7 @@ describe('Validator Domain', function() {
 							}
 						}
 					}
-				});
+				}));
 
 				done(new Error('expected validation to fail'));
 			} catch (err) {
@@ -385,7 +385,7 @@ describe('Validator Domain', function() {
 
 			options.allowExtraKeys = 'asdad';
 			try {
-				new Type(options);
+				console.log(new Type(options));
 				done(new Error('expected Type to fail validation because allowExtraKeys must be a boolean'));
 			} catch (err) {
 				done();
@@ -505,7 +505,7 @@ describe('Validator Domain', function() {
 			expect(type.description).to.equal(options.description);
 
 			var schema = type.getSchema(getObjectSchemaType);
-			expect(schema).to.exist;
+			expect(lodash.isObject(schema)).to.equal(true);
 			console.log(schema);
 
 			type.validate({
@@ -626,7 +626,7 @@ describe('Validator Domain', function() {
 			expect(type.description).to.equal(options.description);
 
 			var schema = type.getSchema(getObjectSchemaType);
-			expect(schema).to.exist;
+			expect(lodash.isObject(schema)).to.equal(true);
 			console.log(schema);
 
 			try {
@@ -699,7 +699,7 @@ describe('Validator Domain', function() {
 			expect(property.type).to.equal(options.type);
 
 			try {
-				new Property();
+				console.log(new Property());
 				done(new Property('Expected Error to be thrown because Property requires type'));
 			} catch (err) {
 				done();
@@ -722,7 +722,7 @@ describe('Validator Domain', function() {
 			expect(property.type).to.equal(options.type);
 
 			try {
-				new Property();
+				console.log(new Property());
 				done(new Property('Expected Error to be thrown because Property requires type'));
 			} catch (err) {
 				done();
@@ -742,7 +742,7 @@ describe('Validator Domain', function() {
 			};
 
 			try {
-				new Property(options);
+				console.log(new Property(options));
 				done(new Property('Expected Error to be thrown because Number.maxXXX is not a valid constraint'));
 			} catch (err) {
 				done();
@@ -755,7 +755,7 @@ describe('Validator Domain', function() {
 			};
 
 			try {
-				new Property(options);
+				console.log(new Property(options));
 				done(new Property('Expected Error to be thrown because type is not supported'));
 			} catch (err) {
 				console.log(err);
@@ -886,10 +886,10 @@ describe('Validator Domain', function() {
 		 * project (https://github.com/spumko/joi/issues/133).
 		 */
 		it.skip('should validate array of mixed Numbers & Strings', function() {
-			var A = joi.types.Array, N = joi.types.Number, S = joi.types.String;
+			var array = joi.types.Array, number = joi.types.Number, string = joi.types.String;
 
 			var schema = {
-				a : A().includes(N(), S())
+				a : array().includes(number(), string())
 			};
 			var error;
 			error = joi.validate({

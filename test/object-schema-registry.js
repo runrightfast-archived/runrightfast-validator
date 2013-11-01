@@ -46,7 +46,7 @@ describe('ObjectSchemaRegistry', function() {
 			version : objectSchema.version,
 			type : 'ConnectionConfig'
 		});
-		expect(type).to.exist;
+		expect(lodash.isObject(type)).to.equal(true);
 		console.log(type);
 	});
 
@@ -67,13 +67,13 @@ describe('ObjectSchemaRegistry', function() {
 			version : objectSchema.version,
 			type : 'ConnectionConfig'
 		});
-		expect(type).to.exist;
+		expect(lodash.isObject(type)).to.equal(true);
 		console.log(type);
 	});
 
 	it('checks that the provided implementation satisfies the ObjectSchemaRegistry interface', function(done) {
 		try {
-			new ObjectSchemaRegistry({});
+			console.log(new ObjectSchemaRegistry({}));
 			done(new Error('Expected an Error because the impl is not valid'));
 		} catch (err) {
 			console.log(err);
